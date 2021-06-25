@@ -8,6 +8,8 @@ import {User} from "./entity/User";
 import {Team} from "./entity/Team";
 import {Match} from "./entity/Match";
 
+import * as express from "express";
+
 
 createConnection()
   .then(async (connection) => {
