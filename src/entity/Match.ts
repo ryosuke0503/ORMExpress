@@ -17,17 +17,17 @@ export class Match extends BaseEntity{
     @Column()
     kind: string;
     @Column()
-    data: string;
+    date: string;
     @Column()
     time: string;
     @Column()
-    home_id: number;
+    home: number;
     @Column()
     homescore: number;
     @Column()
     awayscore: number;
     @Column()
-    away_id: number;
+    away: number;
     @Column()
     stadium: string;
     @Column()

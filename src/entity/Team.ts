@@ -12,7 +12,7 @@ export class Team extends BaseEntity{
     id: number;
 
     @Column()
-    Name: string;
+    name: string;
 
     /*
     @ManyToMany(type => Match, match => match.teams)

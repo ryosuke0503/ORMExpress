@@ -1,7 +1,7 @@
 {
    "type": "sqlite",
-   "database": "apptest.sqlite",
-   "synchronize": true,
+   "database": "apptest.sqlite3",
+   "synchronize": false,
    "logging": false,
    "entities": [
       "src/entity/**/*.ts"
