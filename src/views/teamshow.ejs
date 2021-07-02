@@ -7,12 +7,29 @@
 
       
     <div class="form-group row">
-        <label class="col-form-label col-sm-2" for="id">Id: <%= model.id %></label>
+        <label class="col-form-label col-sm-2" for="id">チームID: <%= model.id %></label>
     </div>      
     <div class="form-group row">
-        <label class="col-form-label col-sm-2" for="name">Name: <%= model.name %></label>
+        <label class="col-form-label col-sm-2" for="name">チーム名: <%= model.name %></label>
     </div>
-      
+    <div class="form-group row">
+      <label class="col-form-label col-sm-2" for="name">試合数: <%= model.matches %></label>
+    </div>
+    <div class="form-group row">
+      <label class="col-form-label col-sm-2" for="name">勝利数: <%= model.wins %></label>
+    </div>
+    <div class="form-group row">
+      <label class="col-form-label col-sm-2" for="name">敗北数: <%= model.loses %></label>
+    </div>
+    <div class="form-group row">
+      <label class="col-form-label col-sm-2" for="name">引分数: <%= model.draws %></label>
+    </div>
+    <div class="form-group row">
+      <label class="col-form-label col-sm-2" for="name">総得点: <%= model.gpoints %></label>
+    </div>
+    <div class="form-group row">
+      <label class="col-form-label col-sm-2" for="name">総失点: <%= model.lpoints %></label>
+    </div>      
 
     <div class="form-group row">
       <label class="col-form-label col-sm-2"></label>

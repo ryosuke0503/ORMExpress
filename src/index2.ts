@@ -19,81 +19,19 @@ const upload = multer({ dest: 'uploads/' })
 
 const app = express();
 
-console.log("here")
 createConnection()
   .then(async (connection) => {
     //console.log(connection)
-    console.log("here1")    
     app.set("view engine", "ejs");
-    console.log("here2")
     app.set("views", path.join(__dirname, "views"));
-    console.log("here3")
     app.use(express.static(path.join(__dirname, "public")));
-    console.log("here4")
     app.use(express.urlencoded({ extended: false }));
-    console.log("here5")
-
-    console.log(
-      connection.query('insert into teams values (2, \'shimizu\')')
-    )
-
-
 
     app.listen(3000, () => { 
       console.log("Server started (http://localhost:3000/) !");
     });
 
     app.get("/", (req, res) => { 
-      /*
-      var sql_create = `CREATE TABLE IF NOT EXISTS Teams (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name VARCHAR(100) NOT NULL
-        );`;
-
-      db.run(sql_create, err => {
-        if (err) {
-          return console.error(err.message);
-        }
-        console.log("Successful creation of the 'Teams' table");
-      });
-      sql_create = `CREATE TABLE IF NOT EXISTS Matches (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        year INTEGER,
-        league VARCHAR(100) NOT NULL,
-        kind VARCHAR(100) NOT NULL,
-        date VARCHAR(100) NOT NULL,
-        time VARCHAR(100) NOT NULL,
-        home INTEGER,
-        homescore INTEGER,
-        awayscore INTEGER,
-        away INTEGER,
-        stadium VARCHAR(100) NOT NULL,
-        viewers INTEGER,
-        broadcasts VARCHAR(100) NOT NULL
-      );`;
-      db.run(sql_create, err => {
-        if (err) {
-          return console.error(err.message);
-        }
-        console.log("Successful creation of the 'Matches' table");
-      });
-      */
-    
-
-      /*
-      const sql_insert = `INSERT INTO Books (Book_ID, Title, Author, Comments) VALUES
-        (1, 'Mrs. Bridge', 'Evan S. Connell', 'First in the serie'),
-        (2, 'Mr. Bridge', 'Evan S. Connell', 'Second in the serie'),
-        (3, 'L''ingénue libertine', 'Colette', 'Minne + Les égarements de Minne');`;
-      db.run(sql_insert, err => {
-        if (err) {
-          return console.error(err.message);
-        }
-        console.log("Successful creation of 3 books");
-      });
-      */
-    
-      //res.send ("Hello world...");
       res.render("index");
     });
     app.get("/about", (req, res) => {
@@ -111,12 +49,6 @@ createConnection()
             .createQueryBuilder()
             .from(Team, 'teams')
             .execute()
-        /*
-        console.log(connection.isConnected)
-        const teamRepository = connection.getRepository(Team)
-        const rows = teamRepository.find();
-        */
-        //console.log(rows);
         res.render("teams", { model: rows });
 
     });
@@ -124,7 +56,6 @@ createConnection()
         const rows = await createQueryBuilder()
         .from(Match, 'matches')
         .execute();
-        //console.log(rows);
         res.render("matches", { model: rows });
     });
     app.get("/teamedit/:id", async (req, res) => {
@@ -133,8 +64,6 @@ createConnection()
         .from(Team, 'teams')
         .where('id = :id', {id: req.params.id})
         .execute();
-        //console.log(row[0])
-        //console.log('id = :id', {id: req.params.id})
         res.render("teamedit", { model: row[0] });
     });
     app.post("/teamedit/:id", (req, res) => {
@@ -193,8 +122,6 @@ createConnection()
                 time: req.body.time, home: req.body.home, homescore: req.body.homescore, awayscore: req.body.awayscore,
                 away: req.body.away, stadium: req.body.stadium, viewers: req.body.viewers, broadcasts: req.body.broadcasts}])
         .execute()
-        //.getSql()
-        //);
         res.redirect("/matches");
     });
     app.get("/teamdelete/:id", async (req, res) => {
@@ -228,14 +155,6 @@ createConnection()
         .where("id = :id", { id: req.params.id })
         .execute();
         res.redirect("/matches") 
-      /*
-      const id = req.params.id;
-      const sql = "DELETE FROM Matches WHERE id = ? ";
-      db.run(sql, id, err => {
-        // if (err) ...
-        res.redirect("/matches");
-      });
-      */
     });
 
     app.get("/teamshow/:id", async (req, res) => {
@@ -247,114 +166,139 @@ createConnection()
       console.log(row[0]);
 
       const id = req.params.id;
-      var matches = 0;
-      var wins = 0;
-      var loses = 0;
-      var draws = 0;
-      var gpoints = 0;
-      var lpoints = 0;
-      var details = {wins:0, loses:0, draws:0, gpoints:0, lpoints:0};
+      var details = {matches:0, wins:0, loses:0, draws:0, gpoints:0, lpoints:0};
 
       var sql = "COUNT(home = "+row[0].id+" or NULL)"
       var tmp = await createQueryBuilder()
       .select(sql)
       .from(Match, 'matches')
       .execute()
-      matches += tmp[0][sql];
+      details.matches += tmp[0][sql];
       sql = "COUNT(away = "+row[0].id+" or NULL)"
       tmp = await createQueryBuilder()
             .select(sql)
             .from(Match, 'matches')
             .execute()
-      matches += tmp[0][sql];
+      details.matches += tmp[0][sql];
       sql = "COUNT((home = "+row[0].id+" or NULL) and (homescore > awayscore or NULL))"
       tmp = await createQueryBuilder()
             .select(sql)
             .from(Match, 'matches')
             .execute()
-      wins += tmp[0][sql];
+      details.wins += tmp[0][sql];
       sql = "COUNT((away = "+row[0].id+" or NULL) and (homescore < awayscore or NULL))"
       tmp = await createQueryBuilder()
             .select(sql)
             .from(Match, 'matches')
             .execute()
-      wins += tmp[0][sql];
+      details.wins += tmp[0][sql];
       sql = "COUNT((home = "+row[0].id+" or NULL) and (homescore < awayscore or NULL))"
       tmp = await createQueryBuilder()
             .select(sql)
             .from(Match, 'matches')
             .execute()
-      loses += tmp[0][sql];
+      details.loses += tmp[0][sql];
       sql = "COUNT((away = "+row[0].id+" or NULL) and (homescore > awayscore or NULL))"
       tmp = await createQueryBuilder()
             .select(sql)
             .from(Match, 'matches')
             .execute()
-      loses += tmp[0][sql];
+      details.loses += tmp[0][sql];
       sql = "COUNT((home = "+row[0].id+" or away = "+row[0].id+" or NULL) and (homescore = awayscore or NULL))"
       tmp = await createQueryBuilder()
             .select(sql)
             .from(Match, 'matches')
             .execute()
-      draws += tmp[0][sql];
-
-      details.wins = wins;
-      details.loses = loses;
-      details.draws = draws;
+      details.draws += tmp[0][sql];
     
-      console.log(wins)
-      console.log(loses)
-      console.log(draws)
+      sql = "matches.home = "+row[0].id
+      tmp = await createQueryBuilder()
+      .select('SUM(homescore)')
+      .from(Match, 'matches')
+      .where(sql)
+      .execute()
+      details.gpoints += tmp[0]['SUM(homescore)'];
+
+      tmp = await createQueryBuilder()
+      .select('SUM(awayscore)')
+      .from(Match, 'matches')
+      .where(sql)
+      .execute()
+      details.lpoints += tmp[0]['SUM(awayscore)'];
+
+      sql = "matches.away = "+row[0].id
+      tmp = await createQueryBuilder()
+      .select('SUM(awayscore)')
+      .from(Match, 'matches')
+      .where(sql)
+      .execute()
+      details.gpoints += tmp[0]['SUM(awayscore)'];
+
+      tmp = await createQueryBuilder()
+      .select('SUM(homescore)')
+      .from(Match, 'matches')
+      .where(sql)
+      .execute()
+      details.lpoints += tmp[0]['SUM(homescore)'];
+
       console.log(details)
-      
+      row[0] = Object.assign(row[0], details)
       res.render("teamshow", { model: row[0] });
     });
     app.post("/teamshow/:id", async (req, res) => {
-      /*    
-      sql = "SELECT * FROM Teams WHERE id = ?";
-      db.get(sql, id, (err, row) => {
-        // if (err) ...
-        console.log(row)
-        res.render("teamshow", { model: row });
-      });
-      */
       res.redirect("/teams");
     });
-
-      /*
-      app.post('/teamupload', upload.single('upName'), (req, res) => {
-        console.log(`originalname: ${req.file.originalname}`)
-        console.log(`path: ${req.file.path}`)
-      
-        const rs = fs.createReadStream(req.file.path);
-        const rl = readline.createInterface({input: rs, });
-        var sql = "";
-        rl.on('line', (linestring)=>{
-          sql = 'INSERT INTO Teams (name) VALUES ('+linestring+')';
-          db.run(sql, err => {
-            if(err){console.log(err);}
-          });
-        })
-      
-        res.redirect("/teams");
+    app.post('/teamupload', upload.single('upName'), (req, res) => {
+      console.log(`originalname: ${req.file.originalname}`)
+      console.log(`path: ${req.file.path}`)
+    
+      const rs = fs.createReadStream(req.file.path);
+      const rl = readline.createInterface({input: rs, });
+      var sql = "";
+      rl.on('line', async (linestring)=>{
+        await createQueryBuilder()
+        .insert()
+        .into(Team)
+        .values([
+          {name: linestring}
+        ])
+        .execute()
       })
-      app.post('/matchupload', upload.single('upName'), (req, res) => {
-        console.log(`originalname: ${req.file.originalname}`)
-        console.log(`path: ${req.file.path}`)
-      
-        const rs = fs.createReadStream(req.file.path);
-        const rl = readline.createInterface({input: rs, });
-        var sql = "";
-        rl.on('line', (linestring)=>{
-          sql = 'INSERT INTO Matches (year, league, kind, date, time, home, homescore, awayscore, away, stadium, viewers, broadcasts) VALUES ('+linestring+')';
-          db.run(sql, err => {
-            if(err){console.log(err);}
-          });
-        })
-      
-        res.redirect("/matches");
-      })
+    
+      res.redirect("/teams");
+    })
 
-      */
+    app.post('/matchupload', upload.single('upName'), (req, res) => {
+      console.log(`originalname: ${req.file.originalname}`)
+      console.log(`path: ${req.file.path}`)
+    
+      const rs = fs.createReadStream(req.file.path);
+      const rl = readline.createInterface({input: rs, });
+      var sql = "";
+      rl.on('line', async (linestring)=>{
+        var arr = linestring.split(',');
+        //console.log(arr)
+        await createQueryBuilder()
+        .insert()
+        .into(Match)
+        .values({
+            year: arr[0],
+            league: arr[1],
+            kind: arr[2],
+            date: arr[3],
+            time: arr[4],
+            home: arr[5],
+            homescore: arr[6],
+            awayscore: arr[7],
+            away: arr[8],
+            stadium: arr[9],
+            viewers: arr[10],
+            broadcasts: arr[11]
+          })
+        .execute()
+      })
+      res.redirect("/matches");
+    })
+    
   })
 .catch((error) => console.log(error));
